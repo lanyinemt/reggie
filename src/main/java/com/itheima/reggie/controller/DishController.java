@@ -42,7 +42,7 @@ public class DishController {
     @PostMapping
     public R<String> save(@RequestBody DishDto dishDto){
         log.info(dishDto.toString());
-        dishService.saveWithFlavor(dishDto);
+        dishService.saveWithFlavor(dishDto);    // 操作两张表
         return R.success("新增菜品成功");
     }
 
@@ -99,5 +99,15 @@ public class DishController {
         DishDto dishDto = dishService.getByIdWithFlavor(id);
 
         return R.success(dishDto);
+    }
+
+    /**
+     * 修改（更新）菜品
+     * @param dishDto
+     * @return
+     */
+    @PutMapping
+    public R<String> update(@RequestBody DishDto dishDto){
+        return R.success("");
     }
 }

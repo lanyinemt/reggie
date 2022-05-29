@@ -9,4 +9,7 @@ public interface DishService extends IService<Dish> {
     public void saveWithFlavor(DishDto dishDto);
 
     public DishDto getByIdWithFlavor(Long id);
+
+    //更新菜品信息 同时修该口味信息
+    public void updateWithFlavor(DishDto dishDto);
 }
