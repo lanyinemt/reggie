@@ -61,6 +61,11 @@ public class CommonController {
         return R.success(fileName);
     }
 
+    /**
+     * 文件下载
+     * @param name
+     * @param response
+     */
     @GetMapping("/download")
     public void download(String name, HttpServletResponse response){
 
@@ -74,6 +79,7 @@ public class CommonController {
             int len = 0;
             byte[] bytes = new byte[1024];
             while ((len = fileInputStream.read(bytes)) != -1){
+//                log.info(String.valueOf(len));    // 除了最后一个 其它都输出1024
                 outputStream.write(bytes, 0, len);
                 outputStream.flush();
             }
@@ -83,6 +89,5 @@ public class CommonController {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
 }
