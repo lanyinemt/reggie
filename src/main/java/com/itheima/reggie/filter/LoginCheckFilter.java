@@ -30,36 +30,55 @@ public class LoginCheckFilter implements Filter {
 
         // 1.获取本次请求的URI
         String requestURI = request.getRequestURI();
-        String[] urls = new String[]{   // 不需要处理的路径
+        log.info("拦截到请求：{}",requestURI);
+
+        //定义不需要处理的请求路径
+        String[] urls = new String[]{
                 "/employee/login",
                 "/employee/logout",
-                "/backend/**",  // 静态资源
-                "/front/** "
+                "/backend/**",
+                "/front/**",
+                "/common/**",
+                "/user/sendMsg",
+                "/user/login"
         };
 
-        // 2.判断请求是否需要处理
+        //2、判断本次请求是否需要处理
         boolean check = check(urls, requestURI);
 
-        // 3.如果不需要处理，这直接放行
-        if (check){
-            filterChain.doFilter(request, response);   // 放行
+        //3、如果不需要处理，则直接放行
+        if(check){
+            log.info("本次请求{}不需要处理",requestURI);
+            filterChain.doFilter(request,response);
             return;
         }
 
-        // 4.判读登录状态，如果已经登录，则直接放行
-        if (request.getSession().getAttribute("employee") != null){
-            // long id = Thread.currentThread().getId();
-            // log.info("当前线程id: {}", id);  // 每次请求都会创建一个线程
-            Long empId = (Long) request.getSession().getAttribute("employee");
-            BaseContext.setCurrentId(empId);     // 作用域是线程内
+        // ###################################
+        //4、需要进行处理 判断登录状态，如果已登录，则直接放行
+        if(request.getSession().getAttribute("employee") != null){
+            log.info("用户已登录，用户id为：{}",request.getSession().getAttribute("employee"));
 
-            filterChain.doFilter(request, response);
-            return;     // 注意返回
+            Long empId = (Long) request.getSession().getAttribute("employee");
+            BaseContext.setCurrentId(empId);
+
+            filterChain.doFilter(request,response);
+            return;
+        }
+        // 判断移动端用户
+        if(request.getSession().getAttribute("user") != null){
+            log.info("用户已登录，用户id为：{}",request.getSession().getAttribute("user"));
+
+            Long userId = (Long) request.getSession().getAttribute("user");
+            BaseContext.setCurrentId(userId);
+
+            filterChain.doFilter(request,response);
+            return;
         }
 
-        // 5.如果未登录 则返回未登录结果，通过输出流的方式
+        log.info("用户未登录");
+        //5、如果未登录则返回未登录结果，通过输出流方式向客户端页面响应数据
         response.getWriter().write(JSON.toJSONString(R.error("NOTLOGIN")));
-        log.info("拦截到请求：{}", request.getRequestURI());
+        return;
     }
 
     /**
